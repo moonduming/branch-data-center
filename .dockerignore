@@ -1,0 +1,11 @@
+.git
+.idea
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.tar
+*.zip
+venv
+logs
+# scripts

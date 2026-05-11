@@ -1,0 +1,182 @@
+匹配以下机构编号对应中文
+44030101 民治支行
+44030102 宝安支行
+44030103 碧海湾支行
+44030104 布吉支行
+44030105 福田支行
+44030106 科技园支行
+44030107 龙岗支行
+44030108 龙华支行
+44030109 罗湖支行
+44030110 南山支行
+
+DATA_DT格式为 YYYY-MM-DD
+
+一、发展转型类指标（440）
+1、日均单位存款
+（1）全口径存款
+select MNG_ORG_ID,sum(CUR_BAL),sum(BAL_YEAR_ACCUM)/天数 from shenzhen_data.i01_sz_acct_sum_d where substr(MNG_ACCNT_PROD_ID,1,4) in ('L120')  and CCY_CD in ('156','B02')  group by MNG_ORG_ID;（分发给各机构时须卡机构ID）
+
+（2）优质存款
+    SELECT P1.ACCNT_ORG_ID
+   ,sum((CASE WHEN P1.MNG_ACCNT_PROD_ID like 'L11002%' or P1.MNG_ACCNT_PROD_ID LIKE 'L12002%' THEN '1'
+         WHEN (P1.MNG_ACCNT_PROD_ID LIKE 'L11001%' or  P1.MNG_ACCNT_PROD_ID LIKE 'L12001%') AND CAST(P1.ACCT_TERM AS DECIMAL(18,4))<='730' THEN '1'
+      WHEN (P1.MNG_ACCNT_PROD_ID LIKE 'L11001%' or  P1.MNG_ACCNT_PROD_ID LIKE 'L12001%') AND CAST(P1.ACCT_TERM AS DECIMAL(18,4))>'730' AND P1.EXEC_RATE<= P4.PARA_SCOPE THEN '1'
+                  ELSE '0' 
+     END)*P1.CUR_BAL) as 时点余额,sum((CASE WHEN P1.MNG_ACCNT_PROD_ID like 'L11002%' or P1.MNG_ACCNT_PROD_ID LIKE 'L12002%' THEN '1'
+         WHEN (P1.MNG_ACCNT_PROD_ID LIKE 'L11001%' or  P1.MNG_ACCNT_PROD_ID LIKE 'L12001%') AND CAST(P1.ACCT_TERM AS DECIMAL(18,4))<='730' THEN '1'
+      WHEN (P1.MNG_ACCNT_PROD_ID LIKE 'L11001%' or  P1.MNG_ACCNT_PROD_ID LIKE 'L12001%') AND CAST(P1.ACCT_TERM AS DECIMAL(18,4))>'730' AND P1.EXEC_RATE<= P4.PARA_SCOPE THEN '1'
+                  ELSE '0' 
+     END)*P1.BAL_YEAR_ACCUM)/天数 as 年日均积数
+    
+  FROM      shenzhen_data.i01_sz_acct_sum_m P1
+  LEFT JOIN shenzhen_data.FDL_REFL_DIM_PARAMET_CONFIG P4
+  ON        (CASE WHEN SUBSTR(P1.MNG_ACCNT_PROD_ID,1,6) = 'L12001' THEN 'CORP_DEP_RT'
+                  WHEN SUBSTR(P1.MNG_ACCNT_PROD_ID,1,6) = 'L11001' THEN 'INDIV_DEP_RT'
+            ELSE '' END ) = P4.DIM_CD
+  AND       P1.INT_ST_DT >= CAST(P4.PARA_ST_VAL AS DATE)
+  AND       P1.INT_ST_DT <  CAST(P4.PARA_END_VAL AS DATE)
+  AND       (CASE WHEN CAST(P1.ACCT_TERM AS DECIMAL(18,4)) > '730' THEN '3Y'
+                  ELSE '' END ) = P4.PARA_CD 
+  AND       P4.YEAR = SUBSTR('2025-12-31',1,4)
+  AND       P4.BIZ_TYPE_CD = 'B_DP_RT'
+  WHERE     P1.DATA_DT='2025-12-31'
+  AND       P1.BASIS_CD IN('M_200')
+  AND       P1.CCY_CD  IN        ('156','B02') 
+  and   SUBSTR(P1.MNG_ACCNT_PROD_ID,1,4) = 'L120'
+  group by P1.ACCNT_ORG_ID
+  order by P1.ACCNT_ORG_ID; （分发给各机构时须卡机构ID）
+
+（3）活期存款
+select MNG_ORG_ID,sum(CUR_BAL),sum(BAL_YEAR_ACCUM)/天数 from shenzhen_data.i01_sz_acct_sum_d where substr(MNG_ACCNT_PROD_ID,1,4) in ('L120')  and CCY_CD in ('156','B02') and  FIX_CUR_FLG='0' group by 1; （分发给各机构时须卡机构ID）
+
+2、日均个人存款
+（1）全口径存款
+select MNG_ORG_ID,sum(CUR_BAL),sum(BAL_YEAR_ACCUM)/天数 from shenzhen_data.i01_sz_acct_sum_d where substr(MNG_ACCNT_PROD_ID,1,4) in ('L110')  and CCY_CD in ('156','B02')  group by MNG_ORG_ID; （分发给各机构时须卡机构ID）
+
+（2）优质存款
+    SELECT P1.ACCNT_ORG_ID
+   ,sum((CASE WHEN P1.MNG_ACCNT_PROD_ID like 'L11002%' or P1.MNG_ACCNT_PROD_ID LIKE 'L12002%' THEN '1'
+         WHEN (P1.MNG_ACCNT_PROD_ID LIKE 'L11001%' or  P1.MNG_ACCNT_PROD_ID LIKE 'L12001%') AND CAST(P1.ACCT_TERM AS DECIMAL(18,4))<='730' THEN '1'
+      WHEN (P1.MNG_ACCNT_PROD_ID LIKE 'L11001%' or  P1.MNG_ACCNT_PROD_ID LIKE 'L12001%') AND CAST(P1.ACCT_TERM AS DECIMAL(18,4))>'730' AND P1.EXEC_RATE<= P4.PARA_SCOPE THEN '1'
+                  ELSE '0' 
+     END)*P1.CUR_BAL) as 时点余额,sum((CASE WHEN P1.MNG_ACCNT_PROD_ID like 'L11002%' or P1.MNG_ACCNT_PROD_ID LIKE 'L12002%' THEN '1'
+         WHEN (P1.MNG_ACCNT_PROD_ID LIKE 'L11001%' or  P1.MNG_ACCNT_PROD_ID LIKE 'L12001%') AND CAST(P1.ACCT_TERM AS DECIMAL(18,4))<='730' THEN '1'
+      WHEN (P1.MNG_ACCNT_PROD_ID LIKE 'L11001%' or  P1.MNG_ACCNT_PROD_ID LIKE 'L12001%') AND CAST(P1.ACCT_TERM AS DECIMAL(18,4))>'730' AND P1.EXEC_RATE<= P4.PARA_SCOPE THEN '1'
+                  ELSE '0' 
+     END)*P1.BAL_YEAR_ACCUM)/365 as 年日均积数
+    
+  FROM      shenzhen_data.i01_sz_acct_sum_m P1
+  LEFT JOIN shenzhen_data.FDL_REFL_DIM_PARAMET_CONFIG P4
+  ON        (CASE WHEN SUBSTR(P1.MNG_ACCNT_PROD_ID,1,6) = 'L12001' THEN 'CORP_DEP_RT'
+                  WHEN SUBSTR(P1.MNG_ACCNT_PROD_ID,1,6) = 'L11001' THEN 'INDIV_DEP_RT'
+            ELSE '' END ) = P4.DIM_CD
+  AND       P1.INT_ST_DT >= CAST(P4.PARA_ST_VAL AS DATE)
+  AND       P1.INT_ST_DT <  CAST(P4.PARA_END_VAL AS DATE)
+  AND       (CASE WHEN CAST(P1.ACCT_TERM AS DECIMAL(18,4)) > '730' THEN '3Y'
+                  ELSE '' END ) = P4.PARA_CD 
+  AND       P4.YEAR = SUBSTR('2025-12-31',1,4)
+  AND       P4.BIZ_TYPE_CD = 'B_DP_RT'
+  WHERE     P1.DATA_DT='2025-12-31'
+  AND       P1.BASIS_CD IN('M_200')
+  AND       P1.CCY_CD  IN        ('156','B02') 
+  and   SUBSTR(P1.MNG_ACCNT_PROD_ID,1,4) = 'L110'
+  group by P1.ACCNT_ORG_ID
+  order by P1.ACCNT_ORG_ID; （分发给各机构时须卡机构ID）
+  
+ （3）日均非储AUM
+select ACCNT_ORG_ID,sum(NONSAVING_SCALE_YEAR_DAY_AVG_BAL)
+ from I01_SZ_INDIV_ASSET_DATA_TBL group by 1 order by 1; （分发给各机构时须卡机构ID）
+ 
+ 二、社会责任类指标（380）
+ 1、个人贷款
+（1）个人贷款（不含徽享薪易贷）
+ select ACCNT_ORG_ID,sum(CUR_BAL),sum(BAL_YEAR_ACCUM)/365 from shenzhen_data.i01_sz_acct_sum_d where substr(MNG_ACCNT_PROD_ID,1,4) ='A110' and MNG_ACCNT_PROD_ID <> 'A11001014001' group by 1 order by 1; （分发给各机构时须卡机构ID）
+ 
+（2） 徽享薪易贷
+ select ACCNT_ORG_ID,sum(CUR_BAL),sum(BAL_YEAR_ACCUM)/365 from shenzhen_data.i01_sz_acct_sum_d where substr(MNG_ACCNT_PROD_ID,1,4) ='A110' and MNG_ACCNT_PROD_ID = 'A110010140; （分发给各机构时须卡机构ID）
+ 
+（3）普惠金融
+select ACCNT_ORG_ID,sum(CUR_BAL) from shenzhen_data.i01_sz_acct_sum_d where  substr(MNG_ACCNT_PROD_ID,1,4) ='A110' and INCR_LOAN_FLG='1'  and CCY_CD in ('156','B02')  group by 1 order by 1; （分发给各机构时须卡机构ID）
+
+2、单位贷款
+(1)公司贷款
+select ACCNT_ORG_ID,sum(CUR_BAL+INT_ADJUST_AMT) from shenzhen_data.i01_sz_acct_sum_d 
+ where LINE_ID <> 'L0103' 
+ and CCY_CD in ('156','B02')
+ and (MNG_ACCNT_PROD_ID like 'A12001%' or MNG_ACCNT_PROD_ID like 'A12002%' or MNG_ACCNT_PROD_ID like 'A12003%' or MNG_ACCNT_PROD_ID like 'A12005%')
+ and (MNG_ACCNT_PROD_ID not in ('A12002015001','A12004001005','A12004002004')) group by 1;（分发给各机构时须卡机构ID）
+ 
+ (2)行标小企业贷款
+ select ACCNT_ORG_ID,sum(CUR_BAL+INT_ADJUST_AMT) from shenzhen_data.i01_sz_acct_sum_d 
+ where LINE_ID = 'L0103' 
+ and CCY_CD in ('156','B02')
+ and (MNG_ACCNT_PROD_ID like 'A12001%' or MNG_ACCNT_PROD_ID like 'A12002%' or MNG_ACCNT_PROD_ID like 'A12003%' or MNG_ACCNT_PROD_ID like 'A12005%')
+ and (MNG_ACCNT_PROD_ID not in ('A12002015001','A12004001005','A12004002004')) group by 1;（分发给各机构时须卡机构ID）
+
+3、五大金融
+（1）普惠金融
+select ACCNT_ORG_ID,sum(CUR_BAL+INT_ADJUST_AMT) from shenzhen_data.i01_sz_acct_sum_d 
+ where CCY_CD in ('156','B02') 
+ and ORIG_AMT <=10000000
+ and substr(MNG_ACCNT_PROD_ID,1,4) ='A120'
+ and INCR_LOAN_FLG in ('1','')
+ and (MNG_ACCNT_PROD_ID like 'A12001%' or MNG_ACCNT_PROD_ID like 'A12002%' )
+ and (MNG_ACCNT_PROD_ID not in ('A12002015001','A12004001005','A12004002004'))
+ group by 1; （分发给各机构时须卡机构ID）
+
+（2）制造业贷款
+select ACCNT_ORG_ID,sum(CUR_BAL+INT_ADJUST_AMT) from shenzhen_data.i01_sz_acct_sum_d where  MANUF_INDUS_LOAN_FLG='1'  and CCY_CD in ('156','B02')  group by 1 order by 1; （分发给各机构时须卡机构ID）
+
+（3）制造业中长期贷款
+select ACCNT_ORG_ID,sum(CUR_BAL+INT_ADJUST_AMT) from shenzhen_data.i01_sz_acct_sum_d where MANUF_INDUS_LONGTERM_LOAN_FLG and CCY_CD in ('156','B02')  group by 1 order by 1; （分发给各机构时须卡机构ID）
+
+（4）战略新兴企业贷款
+select ACCNT_ORG_ID,sum(CUR_BAL+INT_ADJUST_AMT) from shenzhen_data.i01_sz_acct_sum_d where  STRA_EMERGE_INDUS_FLG='1'  and CCY_CD in ('156','B02')  group by 1 order by 1; （分发给各机构时须卡机构ID）
+
+（5）科技型企业贷款
+select ACCNT_ORG_ID,sum(CUR_BAL+INT_ADJUST_AMT) from shenzhen_data.i01_sz_acct_sum_d where  TECH_INNO_LOAN_FLG='1'  and CCY_CD in ('156','B02')  group by 1 order by 1; （分发给各机构时须卡机构ID）
+
+（6）绿色贷款
+select ACCNT_ORG_ID,sum(CUR_BAL+INT_ADJUST_AMT) from shenzhen_data.i01_sz_acct_sum_d where  GREEN_LOAN_FLG='1'  and CCY_CD in ('156','B02')  group by 1 order by 1; （分发给各机构时须卡机构ID）
+
+三、风险管理类（480）
+1、不良资产控制额
+（1）不良资产控制额（个贷）
+select ACCNT_ORG_ID,sum(BAD_LOAN_AMT),count(*) from shenzhen_data.i01_sz_acct_sum_d where substr(MNG_ACCNT_PROD_ID,1,4) ='A110' and MNG_ACCNT_PROD_ID <> 'A11001014001' group by 1 order by 1；（分发给各机构时须卡机构ID）
+
+（2）不良资产控制额（对公）
+select ACCNT_ORG_ID,sum(BAD_LOAN_AMT) from shenzhen_data.i01_sz_acct_sum_d 
+ where LINE_ID <> 'L0103' 
+ and CCY_CD in ('156','B02')
+ and (MNG_ACCNT_PROD_ID like 'A12001%' or MNG_ACCNT_PROD_ID like 'A12002%' or MNG_ACCNT_PROD_ID like 'A12003%' or MNG_ACCNT_PROD_ID like 'A12005%')
+ and (MNG_ACCNT_PROD_ID not in ('A12002015001','A12004001005','A12004002004')) group by 1；（分发给各机构时须卡机构ID）
+ 
+ （3）不良资产控制额（小企业）
+ select ACCNT_ORG_ID,sum(BAD_LOAN_AMT) from shenzhen_data.i01_sz_acct_sum_d 
+ where LINE_ID = 'L0103' 
+ and CCY_CD in ('156','B02')
+ and (MNG_ACCNT_PROD_ID like 'A12001%' or MNG_ACCNT_PROD_ID like 'A12002%' or MNG_ACCNT_PROD_ID like 'A12003%' or MNG_ACCNT_PROD_ID like 'A12005%')
+ and (MNG_ACCNT_PROD_ID not in ('A12002015001','A12004001005','A12004002004')) group by 1；（分发给各机构时须卡机构ID）
+ 
+ 2、逾期贷款控制额
+ （1）逾期贷款控制额（个贷）
+ select ACCNT_ORG_ID,sum(CUR_BAL) from shenzhen_data.i01_sz_acct_sum_d where substr(MNG_ACCNT_PROD_ID,1,4) ='A110' and MNG_ACCNT_PROD_ID <> 'A11001014001' and OVERDUE_FLG = 1 group by 1 order by 1；（分发给各机构时须卡机构ID）
+ 
+ （2）逾期贷款控制额（对公）
+ select ACCNT_ORG_ID,sum(CUR_BAL+INT_ADJUST_AMT) from shenzhen_data.i01_sz_acct_sum_d 
+ where LINE_ID <> 'L0103' 
+ and CCY_CD in ('156','B02')
+ and (MNG_ACCNT_PROD_ID like 'A12001%' or MNG_ACCNT_PROD_ID like 'A12002%' or MNG_ACCNT_PROD_ID like 'A12003%' or MNG_ACCNT_PROD_ID like 'A12005%')
+ and (MNG_ACCNT_PROD_ID not in ('A12002015001','A12004001005','A12004002004')) 
+ and OVERDUE_FLG = 1
+ group by 1；（分发给各机构时须卡机构ID）
+ 
+ （3）逾期贷款控制额（小企业）
+ select ACCNT_ORG_ID,sum(CUR_BAL+INT_ADJUST_AMT) from shenzhen_data.i01_sz_acct_sum_d 
+ where LINE_ID = 'L0103' 
+ and CCY_CD in ('156','B02')
+ and (MNG_ACCNT_PROD_ID like 'A12001%' or MNG_ACCNT_PROD_ID like 'A12002%' or MNG_ACCNT_PROD_ID like 'A12003%' or MNG_ACCNT_PROD_ID like 'A12005%')
+ and (MNG_ACCNT_PROD_ID not in ('A12002015001','A12004001005','A12004002004')) 
+ and OVERDUE_FLG = 1
+ group by 1；（分发给各机构时须卡机构ID）

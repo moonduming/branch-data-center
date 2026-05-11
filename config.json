@@ -1,0 +1,10 @@
+ {
+	"BASE_DIR": "/home/shenzhen_data_ftp/shenzhen_data/",
+	"DB_CONN_INFO": "38.62.168.75:8899",
+	"RUN_AS_USER": "xubin",
+	"DB_USER": "xubin",
+	"DB_PASSWORD": "Aa@147258",
+	"DB_NAME": "shenzhen_data",
+	"CLUSTER_ID": "1",
+	"DB_TOOL_PATH": "/home/xubin/lds_kylin/bin/dbtool"
+} 

@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  web:
+    image: branch-data-center:latest
+    container_name: branch-data-center-web
+    command: gunicorn -c gunicorn_conf.py config.asgi:application
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    depends_on:
+      - redis
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  celery-worker:
+    image: branch-data-center:latest
+    container_name: branch-data-center-worker
+    command: celery -A config worker -l info
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  celery-beat:
+    image: branch-data-center:latest
+    container_name: branch-data-center-beat
+    command: celery -A config beat -l info
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  redis:
+    image: redis:7-alpine
+    container_name: branch-data-center-redis
+    ports:
+      - "6379:6379"
