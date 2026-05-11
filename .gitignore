@@ -1,6 +1,6 @@
 .idea
 .vscode
-config.json
+*.json
 
 __pycache__/
 *.pyc
