@@ -1,6 +1,7 @@
 from datetime import timedelta
 from decimal import Decimal, ROUND_HALF_UP
 
+from django.db import connection
 from django.db.models import Q, Sum
 from django.utils.dateparse import parse_date
 from rest_framework import permissions, status, viewsets
@@ -16,13 +17,17 @@ from .models import (
     DataImportLog,
     PerfIndicator,
     PerfIndicatorResult,
+    PerfIndicatorResultPostProfit,
     PerfIndicatorRule,
+    PerfIndicatorRulePostProfit,
     ResultImportLog,
 )
 from .serializers import (
     DataImportLogQuerySerializer,
     DataImportLogSerializer,
     PerfIndicatorDashboardQuerySerializer,
+    PerfIndicatorPersonalDashboardQuerySerializer,
+    PerfIndicatorPersonalPropStatusQuerySerializer,
     PerfIndicatorRuleSerializer,
     PerfIndicatorSerializer,
     ResultImportIndicatorLogPostProfitSerializer,
@@ -267,83 +272,135 @@ class PerfIndicatorDashboardView(APIView):
         parent_indicator_id = query_serializer.validated_data['parent_indicator_id']
         org_id = (query_serializer.validated_data.get('org_id') or '').strip()
 
-        # 如果没有传入 org_id，判断用户权限
+        return Response(
+            {
+                'message': '查询成功',
+                'data': self._build_dashboard_data(
+                    request=request,
+                    data_dt=data_dt,
+                    parent_indicator_id=parent_indicator_id,
+                    org_id=org_id,
+                    result_model=PerfIndicatorResult,
+                    rule_model=PerfIndicatorRule,
+                    include_org_values=True,
+                    include_series=True,
+                ),
+            }
+        )
+
+    def _validate_dashboard_access_permission(self, request, org_id):
         if not org_id:
             user = request.user
             org_ids = UserOrgRelation.objects.filter(user_id=user.id).values_list('org_id', flat=True)
             orgs_types = set(OrgUnit.objects.filter(
-                status=OrgUnit.Status.NORMAL, 
+                status=OrgUnit.Status.NORMAL,
                 id__in=org_ids).values_list('org_type', flat=True))
             if orgs_types & {OrgUnit.OrgType.SUB_BRANCH, OrgUnit.OrgType.TEAM}:
                 raise ValidationError({'message': '无权限访问', 'data': None})
 
+    def _get_parent_indicator(self, parent_indicator_id):
         parent_indicator = PerfIndicator.objects.filter(
-            id=parent_indicator_id, 
+            id=parent_indicator_id,
             status=PerfIndicator.Status.ENABLED,
         ).first()
-        
         if parent_indicator is None:
             raise ValidationError({'parent_indicator_id': ['父指标不存在']})
+        return parent_indicator
 
-        selected_org = None
+    def _resolve_org_code(self, org_id):
         org_code = None
         if org_id:
             selected_org = OrgUnit.objects.filter(
-                id=org_id, 
+                id=org_id,
                 status=OrgUnit.Status.NORMAL
             ).only('id', 'org_code', 'org_name').first()
             if selected_org is None:
                 raise ValidationError({'org_id': ['机构不存在']})
             org_code = str(selected_org.org_code)
+        return org_code
 
-        leaf_indicators = list(
+    def _get_leaf_indicators(self, parent_indicator_id):
+        return list(
             PerfIndicator.objects.filter(parent_id=parent_indicator_id, status=PerfIndicator.Status.ENABLED)
             .order_by('sort_no', 'id')
-            .only('id', 'indicator_code', 'indicator_name', 'parent_id', 
+            .only('id', 'indicator_code', 'indicator_name', 'parent_id',
                 'display_unit', 'decimal_places', 'sort_no')
         )
 
-        start_dt = data_dt - timedelta(days=29)
+    def _build_dashboard_data(
+        self,
+        *,
+        request,
+        data_dt,
+        parent_indicator_id,
+        org_id,
+        result_model,
+        rule_model,
+        include_org_values,
+        include_series,
+        employee_no=None,
+    ):
+        self._validate_dashboard_access_permission(request, org_id)
+        self._get_parent_indicator(parent_indicator_id)
+        org_code = self._resolve_org_code(org_id)
+        leaf_indicators = self._get_leaf_indicators(parent_indicator_id)
+        start_dt = data_dt - timedelta(days=29) if include_series else data_dt - timedelta(days=1)
+
         aggregated_rows = self._load_indicator_result_map(
             leaf_indicators=leaf_indicators,
             start_dt=start_dt,
             end_dt=data_dt,
             org_code=org_code,
+            result_model=result_model,
+            rule_model=rule_model,
+            employee_no=employee_no,
         )
         indicator_org_snapshot = {}
-        if not org_code:
+        if include_org_values and not org_code:
             indicator_org_snapshot = self._load_indicator_org_snapshot(
                 leaf_indicators=leaf_indicators,
                 data_dt=data_dt,
             )
 
-        indicator_payload = [
-            self._build_indicator_dashboard_item(indicator, data_dt, start_dt, aggregated_rows, indicator_org_snapshot)
+        return [
+            self._build_indicator_dashboard_item(
+                indicator=indicator,
+                data_dt=data_dt,
+                start_dt=start_dt,
+                aggregated_rows=aggregated_rows,
+                indicator_org_snapshot=indicator_org_snapshot,
+                include_org_values=include_org_values,
+                include_series=include_series,
+            )
             for indicator in leaf_indicators
         ]
 
-        return Response(
-            {
-                'message': '查询成功',
-                'data': indicator_payload
-            }
-        )
-
-    def _load_indicator_result_map(self, leaf_indicators, start_dt, end_dt, org_code=None):
+    def _load_indicator_result_map(
+        self,
+        leaf_indicators,
+        start_dt,
+        end_dt,
+        org_code=None,
+        result_model=PerfIndicatorResult,
+        rule_model=PerfIndicatorRule,
+        employee_no=None,
+    ):
         if not leaf_indicators:
             return {}
 
         indicator_ids = [indicator.id for indicator in leaf_indicators]
-        queryset = PerfIndicatorResult.objects.filter(
+        queryset = result_model.objects.filter(
             indicator_id__in=indicator_ids,
             data_dt__range=(start_dt, end_dt),
-            calc_status=PerfIndicatorResult.CalcStatus.SUCCESS,
+            calc_status=result_model.CalcStatus.SUCCESS,
         )
+        if employee_no:
+            queryset = queryset.filter(employee_no=employee_no)
 
         if org_code:
             current_rules = {
                 rule['indicator_id']: self._build_result_org_id(org_code, rule['org_prefix'])
-                for rule in PerfIndicatorRule.objects.filter(indicator_id__in=indicator_ids, is_current=True)
+                for rule in rule_model.objects.filter(indicator_id__in=indicator_ids, is_current=True)
                 .values('indicator_id', 'org_prefix')
             }
             filtered_pairs = {
@@ -434,22 +491,31 @@ class PerfIndicatorDashboardView(APIView):
                 'day_avg_org_values': day_avg_org_values,
                 'point_in_time_org_values': point_in_time_org_values,
             }
-        
+
         return result
 
-    def _build_indicator_dashboard_item(self, indicator, data_dt, start_dt, aggregated_rows, indicator_org_snapshot):
+    def _build_indicator_dashboard_item(
+        self,
+        indicator,
+        data_dt,
+        start_dt,
+        aggregated_rows,
+        indicator_org_snapshot,
+        include_org_values=True,
+        include_series=True,
+    ):
         current_row = aggregated_rows.get((indicator.id, data_dt), {})
         previous_row = aggregated_rows.get((indicator.id, data_dt - timedelta(days=1)), {})
 
         day_avg = current_row.get('day_avg')
         day_avg_dod = self._build_ratio(day_avg, previous_row.get('day_avg'))
         day_avg_dod_direction = self._build_ratio_direction(day_avg_dod)
-        
+
         point_in_time = current_row.get('point_in_time')
         point_in_time_dod = self._build_ratio(point_in_time, previous_row.get('point_in_time'))
         point_in_time_dod_direction = self._build_ratio_direction(point_in_time_dod)
 
-        return {
+        result = {
             'indicator_name': indicator.indicator_name,
             'day_avg': self._to_number(day_avg),
             'day_avg_dod': day_avg_dod,
@@ -460,16 +526,19 @@ class PerfIndicatorDashboardView(APIView):
             'completion_rate': None,
             'completion_rate_ratio': None,
             'completion_rate_direction': None,
-            'org_values': indicator_org_snapshot.get(indicator.id, []),
-            'day_avg_series': self._build_series(indicator.id, start_dt, data_dt, aggregated_rows, 'day_avg'),
-            'point_in_time_series': self._build_series(
+        }
+        if include_org_values:
+            result['org_values'] = indicator_org_snapshot.get(indicator.id, [])
+        if include_series:
+            result['day_avg_series'] = self._build_series(indicator.id, start_dt, data_dt, aggregated_rows, 'day_avg')
+            result['point_in_time_series'] = self._build_series(
                 indicator.id,
                 start_dt,
                 data_dt,
                 aggregated_rows,
                 'point_in_time',
-            ),
-        }
+            )
+        return result
 
     def _build_series(self, indicator_id, start_dt, end_dt, aggregated_rows, field_name):
         series = []
@@ -524,6 +593,81 @@ class PerfIndicatorDashboardView(APIView):
 
     def _build_result_org_id(self, org_code, org_prefix):
         return f'{org_prefix}{org_code}' if org_prefix else org_code
+
+
+class PerfIndicatorPersonalDashboardView(PerfIndicatorDashboardView):
+    """个人业绩指标仪表板视图"""
+
+    def get(self, request):
+        query_serializer = PerfIndicatorPersonalDashboardQuerySerializer(data=request.query_params)
+        query_serializer.is_valid(raise_exception=True)
+
+        return Response(
+            {
+                'message': '查询成功',
+                'data': self._build_dashboard_data(
+                    request=request,
+                    data_dt=query_serializer.validated_data['data_dt'],
+                    parent_indicator_id=query_serializer.validated_data['parent_indicator_id'],
+                    org_id=(query_serializer.validated_data.get('org_id') or '').strip(),
+                    employee_no=query_serializer.validated_data['employee_no'].strip(),
+                    result_model=PerfIndicatorResultPostProfit,
+                    rule_model=PerfIndicatorRulePostProfit,
+                    include_org_values=False,
+                    include_series=False,
+                ),
+            }
+        )
+
+
+class PerfIndicatorPersonalPropStatusView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        query_serializer = PerfIndicatorPersonalPropStatusQuerySerializer(data=request.query_params)
+        query_serializer.is_valid(raise_exception=True)
+        employee_no = query_serializer.validated_data['employee_no'].strip()
+
+        sql = """
+            SELECT
+                a.ACCNT_ORG_ID AS accnt_org_id,
+                a.ECIF_CUST_ID AS ecif_cust_id,
+                a.ORIG_ACCT_ID AS orig_acct_id,
+                a.GENR_ACCT_ID AS genr_acct_id,
+                a.CUST_NAME AS cust_name,
+                c.LINE_ID_NAME AS line_id_name,
+                b.MNG_ACCNT_PROD_NAME AS mng_accnt_prod_name,
+                FORMAT(
+                    a.BAL_MON_ACCUM / (DATEDIFF(a.DATA_DT, DATE_FORMAT(a.DATA_DT, '%%Y-%%m-01')) + 1),
+                    2
+                ) AS month_daily_avg,
+                FORMAT(
+                    a.BAL_YEAR_ACCUM / (DATEDIFF(a.DATA_DT, DATE_FORMAT(a.DATA_DT, '%%Y-01-01')) + 1),
+                    2
+                ) AS year_daily_avg,
+                d.KPI_PROP AS kpi_prop,
+                d.APL_DATA_DT AS apl_data_dt,
+                c.org_code AS org_code
+            FROM i01_sz_acct_sum_d AS a, shenzhen_prop_status AS d, mng_accnt_prod AS b, line_id AS c
+            WHERE a.GENR_ACCT_ID = d.GENR_ACCT_ID
+              AND a.MNG_ACCNT_PROD_ID = b.MNG_ACCNT_PROD_ID
+              AND a.LINE_ID = c.LINE_ID
+              AND c.org_code <> '44030005'
+              AND d.employee_no = %s
+            ORDER BY c.LINE_ID_NAME, a.ECIF_CUST_ID, a.ORIG_ACCT_ID
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql, [employee_no])
+            columns = [column[0] for column in cursor.description]
+            data = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+        return Response(
+            {
+                'message': '查询成功',
+                'data': data,
+            }
+        )
 
 
 # 机构选项

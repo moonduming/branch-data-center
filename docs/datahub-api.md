@@ -305,7 +305,108 @@
 | data_dt | date | 日期 |
 | value | number/null | 当天对应值 |
 
-## 12. 导入日志查询接口
+## 12. 个人业绩看板
+
+- URL：`GET /api/datahub/dashboard/personal/`
+
+查询参数：
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| data_dt | date | 是 | 指定日期，格式 `YYYY-MM-DD` |
+| parent_indicator_id | int | 是 | 父指标 ID |
+| employee_no | string | 是 | 人员编号 |
+| org_id | string | 否 | 机构 ID；为空时不按机构过滤 |
+
+参数取值说明：
+
+- `data_dt`：必须是 `YYYY-MM-DD` 格式，例如 `2026-05-13`
+- `parent_indicator_id`：必须传父指标主键 ID；可通过父指标下拉接口获取
+- `employee_no`：必须传员工编号，例如 `HS0000832`
+- `org_id`：可为空；有值时传机构下拉接口返回的 `id`
+
+返回规则说明：
+
+- 只查询指定父指标下的直属叶子指标
+- 顶层返回结构为：`{ "message": "查询成功", "data": [...] }`
+- `data` 是数组，数组顺序与该父指标下叶子指标的排序一致
+- 数据来源为 `perf_indicator_result_post_profit`
+- 除原看板按机构过滤逻辑外，额外按 `employee_no` 过滤分润结果表
+- `day_avg` 对应结果表 `metric_value`
+- `point_in_time` 对应结果表 `metric_value_2`
+- 当前代码返回：
+  - day_avg_dod（日均日环比）
+  - day_avg_dod_direction（日均环比方向标识）
+  - point_in_time_dod（时点日环比）
+  - point_in_time_dod_direction（时点环比方向标识）
+  - completion_rate（完成率）
+  - completion_rate_ratio（完成率日环比）
+  - completion_rate_direction（完成率环比方向标识）
+- 所有日环比单位均为百分比值，保留 1 位小数，四舍五入
+- 个人业绩看板不返回 `org_values`、`day_avg_series`、`point_in_time_series`
+- 当传入 `org_id` 时，会先根据机构表查出机构编码，再结合分润规则表 `org_prefix` 拼接结果表中的 `org_id` 进行过滤；若未配置分润规则，则按机构编码本身过滤
+
+个人看板返回字段说明：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | 看板项列表 |
+
+叶子指标看板对象字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| indicator_name | string | 指标名称 |
+| day_avg | number/null | 当日日均 |
+| day_avg_dod | number/null | 日均日环比 |
+| day_avg_dod_direction | string/null | 日均环比方向标识：up 表示增长，down 表示下降，flat 表示持平，null 表示无法计算 |
+| point_in_time | number/null | 当日时点 |
+| point_in_time_dod | number/null | 时点日环比 |
+| point_in_time_dod_direction | string/null | 时点环比方向标识：up 表示增长，down 表示下降，flat 表示持平，null 表示无法计算 |
+| completion_rate | number/null | 完成率 |
+| completion_rate_ratio | number/null | 完成率日环比 |
+| completion_rate_direction | string/null | 完成率环比方向标识：up 表示增长，down 表示下降，flat 表示持平，null 表示无法计算 |
+
+## 13. 个人业绩看板占比明细
+
+- URL：`GET /api/datahub/dashboard/personal/prop-statuses/`
+
+查询参数：
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| employee_no | string | 是 | 人员编号 |
+
+返回规则说明：
+
+- 顶层返回结构为：`{ "message": "查询成功", "data": [...] }`
+- 使用原生 SQL 联查 `i01_sz_acct_sum_d`、`shenzhen_prop_status`、`mng_accnt_prod`、`line_id`
+- 查询条件：
+  - `a.GENR_ACCT_ID = d.GENR_ACCT_ID`
+  - `a.MNG_ACCNT_PROD_ID = b.MNG_ACCNT_PROD_ID`
+  - `a.LINE_ID = c.LINE_ID`
+  - `c.org_code <> '44030005'`
+  - `d.employee_no = <参数值>`
+- 返回结果按 `line_id_name`、`ecif_cust_id`、`orig_acct_id` 排序
+
+返回字段说明：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| accnt_org_id | string | 核算机构编号 |
+| ecif_cust_id | string | ECIF 客户编号 |
+| orig_acct_id | string | 原始账号 |
+| genr_acct_id | string | 通用账户号 |
+| cust_name | string | 客户名称 |
+| line_id_name | string | 条线名称 |
+| mng_accnt_prod_name | string | 管理会计产品名称 |
+| month_daily_avg | string | 月日均，SQL 中经 `FORMAT(..., 2)` 格式化后的字符串 |
+| year_daily_avg | string | 年日均，SQL 中经 `FORMAT(..., 2)` 格式化后的字符串 |
+| kpi_prop | decimal/null | 业绩占比 |
+| apl_data_dt | datetime/null | 申请时间 |
+| org_code | string | 条线机构编码 |
+
+## 14. 导入日志查询接口
 
 - URL：`GET /api/datahub/imports/logs/`
 - 权限：管理员
@@ -380,7 +481,7 @@
 | created_at | datetime | 创建时间 |
 | updated_at | datetime | 更新时间 |
 
-## 13. 手动触发总行数据导入
+## 15. 手动触发总行数据导入
 
 - URL：`POST /api/datahub/imports/head-office/trigger/`
 - 权限：管理员
@@ -416,7 +517,7 @@
 - 已成功导入的文件不会重复执行
 - 单个文件最多执行 3 次；达到上限后自动跳过
 
-## 14. 手动触发结果表数据导入
+## 16. 手动触发结果表数据导入
 
 - URL：`POST /api/datahub/imports/result/trigger/`
 - 权限：管理员
@@ -454,7 +555,7 @@
 - 未开启 `force` 时，会先检查依赖表是否都已成功导入
 - 同一数据日期结果表已成功导入时，默认跳过重复执行
 
-## 15. 手动触发分润后结果表数据导入
+## 17. 手动触发分润后结果表数据导入
 
 - URL：`POST /api/datahub/imports/result/post-profit/trigger/`
 - 权限：管理员
@@ -495,7 +596,7 @@
 - 同一任务日期下，已成功的指标不会重复执行，除非显式传入 `force=true`。
 - 任务执行时间较长时，会在指标批次开始和日切换时主动回收旧连接；若遇到数据库连接中断，会自动重试一次整指标批次。
 
-## 16. 手动触发备份任务
+## 18. 手动触发备份任务
 
 - URL：`POST /api/datahub/imports/backup/trigger/`
 - 权限：管理员
@@ -533,7 +634,7 @@
 | task_id | string | 异步任务 ID |
 | data_dt | date | 本次触发的备份业务日期 |
 
-## 17. 机构下拉接口
+## 19. 机构下拉接口
 
 - URL：`GET /api/datahub/org-options/`
 
@@ -544,7 +645,7 @@
 | id | int | 机构 ID |
 | org_name | string | 机构名称 |
 
-## 18. 父指标下拉接口
+## 20. 父指标下拉接口
 
 - URL：`GET /api/datahub/parent-indicator-options/`
 
@@ -555,7 +656,7 @@
 | id | int | 父指标 ID |
 | indicator_name | string | 父指标名称 |
 
-## 19. 指标下拉接口
+## 21. 指标下拉接口
 
 - URL：`GET /api/datahub/indicator-options/`
 

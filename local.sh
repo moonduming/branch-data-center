@@ -59,4 +59,4 @@ echo "All services started successfully."
 # ALTER TABLE data_import_log
 # ADD COLUMN run_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '运行次数';
 
-zip -r project.zip . -x ".git/*" "__pycache__/*" "*.pyc" "venv/*" ".env" ".DS_Store"
+zip -r project.zip . -x ".git/*" ".gitignore" "local.sh" "README.md" "__pycache__/*" "*.pyc" "venv/*" ".env" ".DS_Store"

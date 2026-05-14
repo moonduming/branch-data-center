@@ -2,7 +2,7 @@ import logging
 from datetime import date, timedelta
 
 from django.conf import settings
-from django.db import InterfaceError, OperationalError, close_old_connections, transaction
+from django.db import InterfaceError, OperationalError, close_old_connections
 
 from apps.datahub.models import PerfIndicatorResultPostProfit, PerfIndicatorRulePostProfit
 from apps.datahub.services.indicator_calculation import (
@@ -71,17 +71,16 @@ def _execute_post_profit_rule_batch_once(rule, execution_dates, org_id=None):
     total_written_count = 0
 
     close_old_connections()
-    # todo: 开启事务执行时间过长是否有影响？
-    with transaction.atomic():
-        for current_date in execution_dates:
-            day_result = execute_post_profit_rule_for_date(
-                rule=rule,
-                data_dt=current_date,
-                day_count=current_date.timetuple().tm_yday,
-                org_id=org_id,
-            )
-            day_results.append(day_result)
-            total_written_count += day_result['written_count']
+
+    for current_date in execution_dates:
+        day_result = execute_post_profit_rule_for_date(
+            rule=rule,
+            data_dt=current_date,
+            day_count=current_date.timetuple().tm_yday,
+            org_id=org_id,
+        )
+        day_results.append(day_result)
+        total_written_count += day_result['written_count']
 
     close_old_connections()
     return {

@@ -36,7 +36,7 @@ latest_time AS (
 valid_ratio AS (
     SELECT
         pb.ORIG_ACCT_ID,
-        pb.ACCTN_ORG_ID,
+        pb.ACCOUNTING_ORG_ID,
         pb.employee_no,
         pb.employee_name,
         pb.KPI_PROP
@@ -47,14 +47,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 日均单位存款-优质存款
@@ -102,7 +102,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -110,14 +110,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 日均单位存款-活期存款
@@ -143,7 +143,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -151,14 +151,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 日均个人存款-全口径存款
@@ -183,7 +183,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -191,14 +191,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 日均个人存款-优质存款
@@ -246,7 +246,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -254,14 +254,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 
@@ -293,7 +293,7 @@ latest_time AS (
 valid_ratio AS (
     SELECT
         pb.ECIF_CUST_ID,
-        pb.ACCTN_ORG_ID,
+        pb.ACCOUNTING_ORG_ID,
         pb.employee_no,
         pb.employee_name,
         pb.KPI_PROP
@@ -304,14 +304,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 个人贷款-个人贷款（不含徽享薪易贷）
@@ -336,7 +336,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -344,14 +344,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 个人贷款-徽享薪易贷
@@ -376,7 +376,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -384,14 +384,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 个人贷款-普惠金融
@@ -417,7 +417,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -425,14 +425,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 单位贷款-公司贷款
@@ -459,7 +459,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -467,14 +467,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 单位贷款-行标小企业贷款
@@ -501,7 +501,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -509,14 +509,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 五大金融-普惠金融
@@ -550,7 +550,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -558,14 +558,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 五大金融-制造业贷款
@@ -590,7 +590,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -598,14 +598,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 五大金融-制造业中长期贷款
@@ -630,7 +630,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -638,14 +638,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 五大金融-战略新兴企业贷款
@@ -670,7 +670,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -678,14 +678,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 五大金融-科技型企业贷款
@@ -710,7 +710,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -718,14 +718,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 五大金融-绿色贷款
@@ -750,7 +750,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -758,14 +758,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 不良资产控制额-个贷
@@ -790,7 +790,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -798,14 +798,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 不良资产控制额-对公
@@ -832,7 +832,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -840,14 +840,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 不良资产控制额-小企业
@@ -874,7 +874,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -882,14 +882,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 逾期贷款控制额-个贷
@@ -915,7 +915,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -923,14 +923,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 逾期贷款控制额-对公
@@ -958,7 +958,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -966,14 +966,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;
 
 ---- 逾期贷款控制额-小企业
@@ -1001,7 +1001,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -1009,12 +1009,12 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;

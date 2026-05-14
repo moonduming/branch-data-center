@@ -160,17 +160,18 @@ class HeadOfficeDataImporter:
 
     # 刷新默认历史表
     def refresh_default_history(
-        self, 
-        cursor, 
-        table_name: str, 
-        column_list: str, 
+        self,
+        cursor,
+        table_name: str,
+        column_list: str,
         date_file_name='DATA_DT'
     ) -> None:
         cursor.execute(
-            f'DELETE FROM `{table_name}_history` WHERE `{date_file_name}` = %s',
-            (self.date,)
+            f'DELETE FROM `{table_name}_history` '
+            f'WHERE `{date_file_name}` = %s '
+            f'OR `{date_file_name}` < DATE_SUB(%s, INTERVAL 1 MONTH)',
+            (self.date, self.date),
         )
-        
 
         cursor.execute(
             f'INSERT INTO `{table_name}_history` ({column_list}) SELECT {column_list} FROM `{table_name}`'
@@ -208,8 +209,10 @@ class HeadOfficeDataImporter:
         next_day = current_dt + timedelta(days=1)
         if next_day.month != current_dt.month:
             cursor.execute(
-                f'DELETE FROM `{table_name}_month` WHERE `{date_file_name}` = %s',
-                (self.date,)
+                f'DELETE FROM `{table_name}_month` '
+                f'WHERE `{date_file_name}` = %s '
+                f'OR `{date_file_name}` < DATE_SUB(%s, INTERVAL 30 MONTH)',
+                (self.date, self.date),
             )
             cursor.execute(
                 f'INSERT INTO `{table_name}_month` ({column_list}) SELECT {column_list} FROM `{table_name}`'

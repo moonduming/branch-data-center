@@ -72,13 +72,13 @@ def import_team_data(df: pd.DataFrame):
 
 def get_conn():
     return MySQLdb.connect(
-            host=(os.getenv('MYSQL_HOST') or '').strip(),
-            user=(os.getenv('MYSQL_USER') or '').strip(),
-            passwd=(os.getenv('MYSQL_PASSWORD') or '').strip(),
-            port=int(os.getenv('MYSQL_PORT') or 3306),
-            db=(os.getenv('MYSQL_DATABASE') or '').strip(),
-            charset='utf8mb4',
-        )
+        host=(os.getenv('MYSQL_HOST') or '').strip(),
+        user=(os.getenv('MYSQL_USER') or '').strip(),
+        passwd=(os.getenv('MYSQL_PASSWORD') or '').strip(),
+        port=int(os.getenv('MYSQL_PORT') or 3306),
+        db=(os.getenv('MYSQL_DATABASE') or '').strip(),
+        charset='utf8mb4',
+    )
 
 
 def execute_sql_file(cursor, sql_file_path):
@@ -96,16 +96,16 @@ def main():
 
     # ===== 执行初始化 SQL =====
     print("插入新数据...")
-    # create_table_sql_path = Path(__file__).parent / "new_create.sql"
+    create_table_sql_path = Path(__file__).parent / "new_create.sql"
     insert_workflow_data_sql_path = Path(__file__).parent / "insert_workflow_data.sql"
     insert_perf_indicator_seed = Path(__file__).parent / "insert_perf_indicator_rule_post_profit_seed.sql"
-    # add_filed_sql_path = Path(__file__).parent / "add_field.sql"
+    add_filed_sql_path = Path(__file__).parent / "add_field.sql"
 
     for sql_path in [
-        # create_table_sql_path,
+        create_table_sql_path,
         insert_workflow_data_sql_path,
         insert_perf_indicator_seed,
-        # add_filed_sql_path,
+        add_filed_sql_path,
     ]:
         if sql_path.exists():
             print(f"执行 SQL 文件: {sql_path}")
@@ -118,20 +118,20 @@ def main():
 
     print("--------------------------------")
 
-    # print("机构人员关系表导入团队数据...")
-    # excel_path = Path(__file__).parent / "人员团队.xlsx"
-    # if not excel_path.exists():
-    #     raise FileNotFoundError(f"找不到文件: {excel_path}")
-    #
-    # print(f"开始导入: {excel_path}")
-    #
-    # df = read_excel(str(excel_path))
-    # print(f"读取到 {len(df)} 行数据")
-    #
-    # with transaction.atomic():
-    #     import_team_data(df)
-    #
-    # print("导入完成")
+    print("机构人员关系表导入团队数据...")
+    excel_path = Path(__file__).parent / "人员团队.xlsx"
+    if not excel_path.exists():
+        raise FileNotFoundError(f"找不到文件: {excel_path}")
+
+    print(f"开始导入: {excel_path}")
+
+    df = read_excel(str(excel_path))
+    print(f"读取到 {len(df)} 行数据")
+
+    with transaction.atomic():
+        import_team_data(df)
+
+    print("导入完成")
 
 
 if __name__ == "__main__":

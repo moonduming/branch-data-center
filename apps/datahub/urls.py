@@ -9,6 +9,8 @@ from .views import (
     OrgOptionView,
     ParentIndicatorOptionView,
     PerfIndicatorDashboardView,
+    PerfIndicatorPersonalDashboardView,
+    PerfIndicatorPersonalPropStatusView,
     PerfIndicatorRuleViewSet,
     PerfIndicatorViewSet,
     ResultImportPostProfitTriggerView,
@@ -22,6 +24,12 @@ router.register('indicator-rules', PerfIndicatorRuleViewSet, basename='indicator
 
 urlpatterns = [
     path('dashboard/', PerfIndicatorDashboardView.as_view(), name='indicator-dashboard'),
+    path('dashboard/personal/', PerfIndicatorPersonalDashboardView.as_view(), name='indicator-personal-dashboard'),
+    path(
+        'dashboard/personal/prop-statuses/',
+        PerfIndicatorPersonalPropStatusView.as_view(),
+        name='indicator-personal-prop-statuses',
+    ),
     path('imports/logs/', DataImportLogView.as_view(), name='data-import-log-list'),
     path('imports/backup/trigger/', AutoLoadDataBackupTriggerView.as_view(), name='data-backup-trigger'),
     path('imports/head-office/trigger/', HeadOfficeImportTriggerView.as_view(), name='head-office-import-trigger'),

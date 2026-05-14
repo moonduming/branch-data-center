@@ -154,7 +154,7 @@ class ShenzhenPropStatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                   AND a.ORIG_ACCT_ID IS NOT NULL
                   AND a.LINE_ID <> 'L0205'
                   AND (a.CUST_NAME = %s OR a.ORIG_ACCT_ID = %s OR a.ECIF_CUST_ID = %s)
-                  AND (a.ACCNT_ORG_ID = %s OR a.MNG_ORG_ID = %s OR a.MNG_ORG_ID LIKE %s)
+                  AND a.ACCNT_ORG_ID = %s
                   AND c.org_code <> '44030005'
 
                 UNION ALL
@@ -186,16 +186,15 @@ class ShenzhenPropStatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                   AND a.ORIG_ACCT_ID IS NOT NULL
                   AND a.LINE_ID <> 'L0205'
                   AND (a.CUST_NAME = %s OR a.ORIG_ACCT_ID = %s OR a.ECIF_CUST_ID = %s)
-                  AND (a.ACCNT_ORG_ID = %s OR a.MNG_ORG_ID = %s OR a.MNG_ORG_ID LIKE %s)
+                  AND a.ACCNT_ORG_ID = %s
                   AND c.org_code = '44030005'
                 GROUP BY a.ECIF_CUST_ID, c.org_code
             ) AS account_rows
             ORDER BY org_code, ecif_cust_id, orig_acct_id
         """
-        org_like = f"%{org_code}"
         params = [
-            key, key, key, org_code, org_code, org_like,
-            key, key, key, org_code, org_code, org_like,
+            key, key, key, org_code,
+            key, key, key, org_code,
         ]
         with connection.cursor() as cursor:
             cursor.execute(sql, params)
@@ -358,12 +357,11 @@ class ShenzhenPropStatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         prop_status_map = self._group_prop_status_queryset(
             ShenzhenPropStatus.objects
             .filter(accounting_org_id=org_code, prop_status_flg=PropStatusFlg.YES)
-            .filter(self._build_key_filter(key))
         )
         if not prop_status_map:
             return []
 
-        account_rows = self._build_account_queryset(key=key)
+        account_rows = self._build_account_queryset(org_id=org_id, key=key)
         account_map = {
             row["genr_acct_id"]: row
             for row in account_rows

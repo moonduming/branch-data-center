@@ -42,7 +42,7 @@ latest_time AS (
 valid_ratio AS (
     SELECT
         pb.ORIG_ACCT_ID,
-        pb.ACCTN_ORG_ID,
+        pb.ACCOUNTING_ORG_ID,
         pb.employee_no,
         pb.employee_name,
         pb.KPI_PROP
@@ -53,14 +53,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 3 THEN 'WITH base_indicator AS (
     SELECT
@@ -106,7 +106,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -114,14 +114,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 4 THEN 'WITH base_indicator AS (
     SELECT
@@ -145,7 +145,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -153,14 +153,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 5 THEN 'WITH base_indicator AS (
     SELECT
@@ -183,7 +183,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -191,14 +191,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 6 THEN 'WITH base_indicator AS (
     SELECT
@@ -244,7 +244,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -252,14 +252,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 7 THEN 'WITH base_indicator AS (
     SELECT
@@ -288,7 +288,7 @@ latest_time AS (
 valid_ratio AS (
     SELECT
         pb.ECIF_CUST_ID,
-        pb.ACCTN_ORG_ID,
+        pb.ACCOUNTING_ORG_ID,
         pb.employee_no,
         pb.employee_name,
         pb.KPI_PROP
@@ -299,14 +299,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 9 THEN 'WITH base_indicator AS (
     SELECT
@@ -329,7 +329,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -337,14 +337,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 10 THEN 'WITH base_indicator AS (
     SELECT
@@ -367,7 +367,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -375,14 +375,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 11 THEN 'WITH base_indicator AS (
     SELECT
@@ -406,7 +406,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -414,14 +414,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 12 THEN 'WITH base_indicator AS (
     SELECT
@@ -446,7 +446,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -454,14 +454,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 13 THEN 'WITH base_indicator AS (
     SELECT
@@ -486,7 +486,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -494,14 +494,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 14 THEN 'WITH base_indicator AS (
     SELECT
@@ -533,7 +533,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -541,14 +541,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 15 THEN 'WITH base_indicator AS (
     SELECT
@@ -571,7 +571,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -579,14 +579,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 16 THEN 'WITH base_indicator AS (
     SELECT
@@ -609,7 +609,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -617,14 +617,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 17 THEN 'WITH base_indicator AS (
     SELECT
@@ -647,7 +647,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -655,14 +655,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 18 THEN 'WITH base_indicator AS (
     SELECT
@@ -685,7 +685,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -693,14 +693,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 19 THEN 'WITH base_indicator AS (
     SELECT
@@ -723,7 +723,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -731,14 +731,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 21 THEN 'WITH base_indicator AS (
     SELECT
@@ -761,7 +761,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -769,14 +769,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 22 THEN 'WITH base_indicator AS (
     SELECT
@@ -801,7 +801,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -809,14 +809,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 23 THEN 'WITH base_indicator AS (
     SELECT
@@ -841,7 +841,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -849,14 +849,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 24 THEN 'WITH base_indicator AS (
     SELECT
@@ -880,7 +880,7 @@ latest_time AS (
     GROUP BY ECIF_CUST_ID
 ),
 valid_ratio AS (
-    SELECT pb.ECIF_CUST_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ECIF_CUST_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ECIF_CUST_ID = lt.ECIF_CUST_ID
@@ -888,14 +888,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ECIF_CUST_ID = vr.ECIF_CUST_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 25 THEN 'WITH base_indicator AS (
     SELECT
@@ -921,7 +921,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -929,14 +929,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
         WHEN 26 THEN 'WITH base_indicator AS (
     SELECT
@@ -962,7 +962,7 @@ latest_time AS (
     GROUP BY ORIG_ACCT_ID
 ),
 valid_ratio AS (
-    SELECT pb.ORIG_ACCT_ID, pb.ACCTN_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
+    SELECT pb.ORIG_ACCT_ID, pb.ACCOUNTING_ORG_ID, pb.employee_no, pb.employee_name, pb.KPI_PROP
     FROM shenzhen_data.shenzhen_prop_status pb
     INNER JOIN latest_time lt
         ON pb.ORIG_ACCT_ID = lt.ORIG_ACCT_ID
@@ -970,14 +970,14 @@ valid_ratio AS (
     WHERE pb.PROP_STATUS_FLG = ''1''
 )
 SELECT
-    vr.ACCTN_ORG_ID AS org_id,
+    vr.ACCOUNTING_ORG_ID AS org_id,
     vr.employee_no,
     vr.employee_name,
     SUM(bi.metric_value_2 * vr.KPI_PROP) AS metric_value_2
 FROM base_indicator bi
 INNER JOIN valid_ratio vr
     ON bi.ORIG_ACCT_ID = vr.ORIG_ACCT_ID
-GROUP BY vr.ACCTN_ORG_ID, vr.employee_no, vr.employee_name
+GROUP BY vr.ACCOUNTING_ORG_ID, vr.employee_no, vr.employee_name
 ORDER BY org_id, employee_no;'
     END AS point_sql_template,
     CASE r.indicator_id
@@ -1002,11 +1002,11 @@ prop_raw AS (
     SELECT
         p.ORIG_ACCT_ID,
         p.DATA_DT AS eff_date,
-        p.ACCTN_ORG_ID AS org_id,
+        p.ACCOUNTING_ORG_ID AS org_id,
         p.employee_no,
         p.employee_name,
         p.KPI_PROP,
-        p.BASE_ACCUM
+        p.YEAR_BASE_AMOUNT
     FROM shenzhen_data.shenzhen_prop_status p
     CROSS JOIN params pm
     WHERE p.DATA_DT <= pm.period_end
@@ -1053,7 +1053,7 @@ latest_prop_before_start AS (
         p.employee_no,
         p.employee_name,
         p.KPI_PROP,
-        p.BASE_ACCUM,
+        p.YEAR_BASE_AMOUNT,
         ROW_NUMBER() OVER (
             PARTITION BY i.ORIG_ACCT_ID, i.interval_start
             ORDER BY p.eff_date DESC
@@ -1072,7 +1072,7 @@ interval_props AS (
         lp.employee_no,
         lp.employee_name,
         lp.KPI_PROP,
-        CASE WHEN i.interval_start = pm.period_start THEN 0 ELSE lp.BASE_ACCUM END AS base_accum
+        CASE WHEN i.interval_start = pm.period_start THEN 0 ELSE lp.YEAR_BASE_AMOUNT END AS base_accum
     FROM intervals i
     CROSS JOIN params pm
     LEFT JOIN latest_prop_before_start lp
@@ -1263,11 +1263,11 @@ prop_raw AS (
     SELECT
         p.ORIG_ACCT_ID,
         p.DATA_DT AS eff_date,
-        p.ACCTN_ORG_ID AS org_id,
+        p.ACCOUNTING_ORG_ID AS org_id,
         p.employee_no,
         p.employee_name,
         p.KPI_PROP,
-        p.BASE_ACCUM
+        p.YEAR_BASE_AMOUNT
     FROM shenzhen_data.shenzhen_prop_status p
     CROSS JOIN params pm
     WHERE p.DATA_DT <= pm.period_end
@@ -1312,7 +1312,7 @@ latest_prop_before_start AS (
         p.employee_no,
         p.employee_name,
         p.KPI_PROP,
-        p.BASE_ACCUM,
+        p.YEAR_BASE_AMOUNT,
         ROW_NUMBER() OVER (
             PARTITION BY i.ORIG_ACCT_ID, i.interval_start
             ORDER BY p.eff_date DESC
@@ -1331,7 +1331,7 @@ interval_props AS (
         lp.employee_no,
         lp.employee_name,
         lp.KPI_PROP,
-        CASE WHEN i.interval_start = pm.period_start THEN 0 ELSE lp.BASE_ACCUM END AS base_accum
+        CASE WHEN i.interval_start = pm.period_start THEN 0 ELSE lp.YEAR_BASE_AMOUNT END AS base_accum
     FROM intervals i
     CROSS JOIN params pm
     LEFT JOIN latest_prop_before_start lp
@@ -1372,15 +1372,22 @@ daily_accum_by_org AS (
        AND a.DATA_DT < o.exit_date
 ),
 org_base AS (
-    SELECT ORIG_ACCT_ID, org_id, SUM(base_accum * KPI_PROP) AS base_accum
+    SELECT
+        ORIG_ACCT_ID,
+        org_id,
+        employee_no,
+        employee_name,
+        SUM(base_accum * KPI_PROP) AS base_accum
     FROM org_ownership_span
-    GROUP BY ORIG_ACCT_ID, org_id
+    GROUP BY ORIG_ACCT_ID, org_id, employee_no, employee_name
 ),
 org_active_accum AS (
     SELECT
         d.ORIG_ACCT_ID,
         d.DATA_DT,
         d.org_id,
+        d.employee_no,
+        d.employee_name,
         GREATEST(d.org_accum_share - b.base_accum, 0) AS effective_accum
     FROM daily_accum_by_org d
     INNER JOIN org_base b
@@ -1397,6 +1404,8 @@ daily_factor AS (
 org_daily_contrib AS (
     SELECT
         a.org_id,
+        a.employee_no,
+        a.employee_name,
         a.DATA_DT,
         a.effective_accum / f.day_num AS daily_contrib
     FROM org_active_accum a
@@ -1432,11 +1441,11 @@ prop_raw AS (
     SELECT
         p.ORIG_ACCT_ID,
         p.DATA_DT AS eff_date,
-        p.ACCTN_ORG_ID AS org_id,
+        p.ACCOUNTING_ORG_ID AS org_id,
         p.employee_no,
         p.employee_name,
         p.KPI_PROP,
-        p.BASE_ACCUM
+        p.YEAR_BASE_AMOUNT
     FROM shenzhen_data.shenzhen_prop_status p
     CROSS JOIN params pm
     WHERE p.DATA_DT <= pm.period_end
@@ -1481,7 +1490,7 @@ latest_prop_before_start AS (
         p.employee_no,
         p.employee_name,
         p.KPI_PROP,
-        p.BASE_ACCUM,
+        p.YEAR_BASE_AMOUNT,
         ROW_NUMBER() OVER (
             PARTITION BY i.ORIG_ACCT_ID, i.interval_start
             ORDER BY p.eff_date DESC
@@ -1500,7 +1509,7 @@ interval_props AS (
         lp.employee_no,
         lp.employee_name,
         lp.KPI_PROP,
-        CASE WHEN i.interval_start = pm.period_start THEN 0 ELSE lp.BASE_ACCUM END AS base_accum
+        CASE WHEN i.interval_start = pm.period_start THEN 0 ELSE lp.YEAR_BASE_AMOUNT END AS base_accum
     FROM intervals i
     CROSS JOIN params pm
     LEFT JOIN latest_prop_before_start lp
@@ -1541,15 +1550,22 @@ daily_accum_by_org AS (
        AND a.DATA_DT < o.exit_date
 ),
 org_base AS (
-    SELECT ORIG_ACCT_ID, org_id, SUM(base_accum * KPI_PROP) AS base_accum
+    SELECT
+        ORIG_ACCT_ID,
+        org_id,
+        employee_no,
+        employee_name,
+        SUM(base_accum * KPI_PROP) AS base_accum
     FROM org_ownership_span
-    GROUP BY ORIG_ACCT_ID, org_id
+    GROUP BY ORIG_ACCT_ID, org_id, employee_no, employee_name
 ),
 org_active_accum AS (
     SELECT
         d.ORIG_ACCT_ID,
         d.DATA_DT,
         d.org_id,
+        d.employee_no,
+        d.employee_name,
         GREATEST(d.org_accum_share - b.base_accum, 0) AS effective_accum
     FROM daily_accum_by_org d
     INNER JOIN org_base b
@@ -1566,6 +1582,8 @@ daily_factor AS (
 org_daily_contrib AS (
     SELECT
         a.org_id,
+        a.employee_no,
+        a.employee_name,
         a.DATA_DT,
         a.effective_accum / f.day_num AS daily_contrib
     FROM org_active_accum a
@@ -1600,11 +1618,11 @@ prop_raw AS (
     SELECT
         p.ECIF_CUST_ID,
         p.DATA_DT AS eff_date,
-        p.ACCTN_ORG_ID AS org_id,
+        p.ACCOUNTING_ORG_ID AS org_id,
         p.employee_no,
         p.employee_name,
         p.KPI_PROP,
-        p.BASE_ACCUM
+        p.YEAR_BASE_AMOUNT
     FROM shenzhen_data.shenzhen_prop_status p
     CROSS JOIN params pm
     WHERE p.DATA_DT <= pm.period_end
@@ -1649,7 +1667,7 @@ latest_prop_before_start AS (
         p.employee_no,
         p.employee_name,
         p.KPI_PROP,
-        p.BASE_ACCUM,
+        p.YEAR_BASE_AMOUNT,
         ROW_NUMBER() OVER (
             PARTITION BY i.ECIF_CUST_ID, i.interval_start
             ORDER BY p.eff_date DESC
@@ -1668,7 +1686,7 @@ interval_props AS (
         lp.employee_no,
         lp.employee_name,
         lp.KPI_PROP,
-        CASE WHEN i.interval_start = pm.period_start THEN 0 ELSE lp.BASE_ACCUM END AS base_accum
+        CASE WHEN i.interval_start = pm.period_start THEN 0 ELSE lp.YEAR_BASE_AMOUNT END AS base_accum
     FROM intervals i
     CROSS JOIN params pm
     LEFT JOIN latest_prop_before_start lp
@@ -1709,15 +1727,22 @@ daily_accum_by_org AS (
        AND a.DATA_DT < o.exit_date
 ),
 org_base AS (
-    SELECT ECIF_CUST_ID, org_id, SUM(base_accum * KPI_PROP) AS base_accum
+    SELECT
+        ECIF_CUST_ID,
+        org_id,
+        employee_no,
+        employee_name,
+        SUM(base_accum * KPI_PROP) AS base_accum
     FROM org_ownership_span
-    GROUP BY ECIF_CUST_ID, org_id
+    GROUP BY ECIF_CUST_ID, org_id, employee_no, employee_name
 ),
 org_active_accum AS (
     SELECT
         d.ECIF_CUST_ID,
         d.DATA_DT,
         d.org_id,
+        d.employee_no,
+        d.employee_name,
         GREATEST(d.org_accum_share - b.base_accum, 0) AS effective_accum
     FROM daily_accum_by_org d
     INNER JOIN org_base b
@@ -1734,6 +1759,8 @@ daily_factor AS (
 org_daily_contrib AS (
     SELECT
         a.org_id,
+        a.employee_no,
+        a.employee_name,
         a.DATA_DT,
         a.effective_accum / f.day_num AS daily_contrib
     FROM org_active_accum a
@@ -1788,11 +1815,11 @@ prop_raw AS (
     SELECT
         p.ECIF_CUST_ID,
         p.DATA_DT AS eff_date,
-        p.ACCTN_ORG_ID AS org_id,
+        p.ACCOUNTING_ORG_ID AS org_id,
         p.employee_no,
         p.employee_name,
         p.KPI_PROP,
-        p.BASE_ACCUM
+        p.YEAR_BASE_AMOUNT
     FROM shenzhen_data.shenzhen_prop_status p
     CROSS JOIN params pm
     WHERE p.DATA_DT <= pm.period_end
@@ -1837,7 +1864,7 @@ latest_prop_before_start AS (
         p.employee_no,
         p.employee_name,
         p.KPI_PROP,
-        p.BASE_ACCUM,
+        p.YEAR_BASE_AMOUNT,
         ROW_NUMBER() OVER (
             PARTITION BY i.ECIF_CUST_ID, i.interval_start
             ORDER BY p.eff_date DESC
@@ -1856,7 +1883,7 @@ interval_props AS (
         lp.employee_no,
         lp.employee_name,
         lp.KPI_PROP,
-        CASE WHEN i.interval_start = pm.period_start THEN 0 ELSE lp.BASE_ACCUM END AS base_accum
+        CASE WHEN i.interval_start = pm.period_start THEN 0 ELSE lp.YEAR_BASE_AMOUNT END AS base_accum
     FROM intervals i
     CROSS JOIN params pm
     LEFT JOIN latest_prop_before_start lp
@@ -1897,15 +1924,22 @@ daily_accum_by_org AS (
        AND a.DATA_DT < o.exit_date
 ),
 org_base AS (
-    SELECT ECIF_CUST_ID, org_id, SUM(base_accum * KPI_PROP) AS base_accum
+    SELECT
+        ECIF_CUST_ID,
+        org_id,
+        employee_no,
+        employee_name,
+        SUM(base_accum * KPI_PROP) AS base_accum
     FROM org_ownership_span
-    GROUP BY ECIF_CUST_ID, org_id
+    GROUP BY ECIF_CUST_ID, org_id, employee_no, employee_name
 ),
 org_active_accum AS (
     SELECT
         d.ECIF_CUST_ID,
         d.DATA_DT,
         d.org_id,
+        d.employee_no,
+        d.employee_name,
         GREATEST(d.org_accum_share - b.base_accum, 0) AS effective_accum
     FROM daily_accum_by_org d
     INNER JOIN org_base b
@@ -1922,6 +1956,8 @@ daily_factor AS (
 org_daily_contrib AS (
     SELECT
         a.org_id,
+        a.employee_no,
+        a.employee_name,
         a.DATA_DT,
         a.effective_accum / f.day_num AS daily_contrib
     FROM org_active_accum a

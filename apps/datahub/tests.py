@@ -1,5 +1,6 @@
 from datetime import date
 from contextlib import nullcontext
+from decimal import Decimal
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
@@ -26,6 +27,9 @@ from apps.datahub.views import (
     AutoLoadDataBackupTriggerView,
     HeadOfficeImportTriggerView,
     IndicatorOptionView,
+    PerfIndicatorDashboardView,
+    PerfIndicatorPersonalDashboardView,
+    PerfIndicatorPersonalPropStatusView,
     ResultImportPostProfitTriggerView,
     ResultImportTriggerView,
 )
@@ -340,6 +344,125 @@ class AutoLoadDataBackupServiceTests(SimpleTestCase):
                 self.assertEqual(result['status'], 'success')
                 self.assertFalse(source_dir.exists())
                 self.assertTrue(service.archive_path.exists())
+
+
+class PersonalDashboardViewTests(SimpleTestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user = SimpleNamespace(id=1, is_authenticated=True, user_level='99')
+
+    def test_build_indicator_dashboard_item_can_skip_org_and_series_fields(self):
+        view = PerfIndicatorDashboardView()
+        indicator = SimpleNamespace(id=101, indicator_name='测试指标')
+        aggregated_rows = {
+            (101, date(2026, 3, 24)): {'day_avg': Decimal('1000'), 'point_in_time': Decimal('2000')},
+            (101, date(2026, 3, 23)): {'day_avg': Decimal('800'), 'point_in_time': Decimal('1600')},
+        }
+
+        item = view._build_indicator_dashboard_item(
+            indicator=indicator,
+            data_dt=date(2026, 3, 24),
+            start_dt=date(2026, 2, 24),
+            aggregated_rows=aggregated_rows,
+            indicator_org_snapshot={},
+            include_org_values=False,
+            include_series=False,
+        )
+
+        self.assertEqual(item['indicator_name'], '测试指标')
+        self.assertNotIn('org_values', item)
+        self.assertNotIn('day_avg_series', item)
+        self.assertNotIn('point_in_time_series', item)
+        self.assertEqual(item['day_avg_dod'], 25.0)
+        self.assertEqual(item['point_in_time_dod'], 25.0)
+
+    @patch('apps.datahub.views.PerfIndicatorPersonalDashboardView._build_dashboard_data')
+    def test_personal_dashboard_view_requires_employee_no_and_uses_post_profit_builder(self, mock_build_dashboard_data):
+        mock_build_dashboard_data.return_value = [{'indicator_name': '测试指标'}]
+        request = self.factory.get(
+            '/api/datahub/dashboard/personal/',
+            {
+                'data_dt': '2026-03-24',
+                'parent_indicator_id': 1,
+                'employee_no': 'EMP001',
+            },
+        )
+        force_authenticate(request, user=self.user)
+
+        response = PerfIndicatorPersonalDashboardView.as_view()(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['data'], [{'indicator_name': '测试指标'}])
+        build_kwargs = mock_build_dashboard_data.call_args.kwargs
+        self.assertEqual(build_kwargs['employee_no'], 'EMP001')
+
+    @patch('apps.datahub.views.connection')
+    def test_personal_prop_status_view_queries_with_raw_sql(self, mock_connection):
+        cursor = MagicMock()
+        mock_connection.cursor.return_value.__enter__.return_value = cursor
+        cursor.description = [
+            ('accnt_org_id',),
+            ('ecif_cust_id',),
+            ('orig_acct_id',),
+            ('genr_acct_id',),
+            ('cust_name',),
+            ('line_id_name',),
+            ('mng_accnt_prod_name',),
+            ('month_daily_avg',),
+            ('year_daily_avg',),
+            ('kpi_prop',),
+            ('apl_data_dt',),
+            ('org_code',),
+        ]
+        cursor.fetchall.return_value = [
+            (
+                '44030101',
+                'ECIF001',
+                'ACCT001',
+                'GENR001',
+                '张三',
+                '公司银行条线',
+                '产品A',
+                '1,234.56',
+                '7,890.12',
+                Decimal('0.5000'),
+                '2026-05-01 10:00:00',
+                '44030001',
+            )
+        ]
+
+        request = self.factory.get(
+            '/api/datahub/dashboard/personal/prop-statuses/',
+            {'employee_no': 'EMP001'},
+        )
+        force_authenticate(request, user=self.user)
+
+        response = PerfIndicatorPersonalPropStatusView.as_view()(request)
+
+        self.assertEqual(response.status_code, 200)
+        executed_sql = cursor.execute.call_args.args[0]
+        self.assertIn('FROM i01_sz_acct_sum_d AS a, shenzhen_prop_status AS d, mng_accnt_prod AS b, line_id AS c', executed_sql)
+        self.assertIn("AND d.employee_no = %s", executed_sql)
+        self.assertEqual(cursor.execute.call_args.args[1], ['EMP001'])
+        self.assertEqual(
+            response.data['data'],
+            [
+                {
+                    'accnt_org_id': '44030101',
+                    'ecif_cust_id': 'ECIF001',
+                    'orig_acct_id': 'ACCT001',
+                    'genr_acct_id': 'GENR001',
+                    'cust_name': '张三',
+                    'line_id_name': '公司银行条线',
+                    'mng_accnt_prod_name': '产品A',
+                    'month_daily_avg': '1,234.56',
+                    'year_daily_avg': '7,890.12',
+                    'kpi_prop': Decimal('0.5000'),
+                    'apl_data_dt': '2026-05-01 10:00:00',
+                    'org_code': '44030001',
+                }
+            ],
+        )
 
 
 class HeadOfficeImportServiceTests(SimpleTestCase):
