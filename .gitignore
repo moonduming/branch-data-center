@@ -31,3 +31,34 @@ dist/
 build/
 
 *.log
+
+# Private environment/configuration and local backups
+.private/
+private/
+secrets/
+config.json
+config.*.json
+config/settings/local.py
+config/settings/private.py
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+id_rsa*
+id_ed25519*
+.aws/
+.ssh/
+.DS_Store
+*.sqlite3
+*.sql.gz
+*.dump
+*.bak
+
+# Personnel data and business source attachments are local-only
+*.xlsx
+*.xls
+*.csv
+*.tsv
+/流程图*.png
+*.zip.tmp
