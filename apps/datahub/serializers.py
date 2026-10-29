@@ -214,6 +214,7 @@ class PerfIndicatorPersonalDashboardQuerySerializer(PerfIndicatorDashboardQueryS
 
 class PerfIndicatorPersonalPropStatusQuerySerializer(serializers.Serializer):
     employee_no = serializers.CharField(required=True, allow_blank=False, max_length=32)
+    key = serializers.CharField(required=False, allow_blank=True, default='', max_length=32)
 
 
 class DataImportLogQuerySerializer(serializers.Serializer):

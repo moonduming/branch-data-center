@@ -2,7 +2,9 @@
 
 set -e
 
-# echo "Starting branch-data-center services..."
+# dbtool_service.py 和 config.json 文件需要与 star.sh 平级
+# 打包镜像名必须叫images.tar
+# .env 配置文件不要忘记，也需要与 star.sh 平级
 
 # 删除旧容器（如果存在）
 docker rm -f branch-data-center-redis >/dev/null 2>&1 || true

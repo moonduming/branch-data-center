@@ -9,6 +9,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.drf import CountDataPagination
 from common.permissions import IsAdminUserLevel
 from common.query import parse_bool_param
 from ..organization.models import OrgUnit, UserOrgRelation
@@ -544,7 +545,6 @@ class PerfIndicatorDashboardView(APIView):
         series = []
         has_value = False
         current_dt = start_dt
-
         while current_dt <= end_dt:
             value = aggregated_rows.get((indicator_id, current_dt), {}).get(field_name)
             if value is not None:
@@ -622,50 +622,70 @@ class PerfIndicatorPersonalDashboardView(PerfIndicatorDashboardView):
 
 class PerfIndicatorPersonalPropStatusView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = CountDataPagination
 
     def get(self, request):
         query_serializer = PerfIndicatorPersonalPropStatusQuerySerializer(data=request.query_params)
         query_serializer.is_valid(raise_exception=True)
         employee_no = query_serializer.validated_data['employee_no'].strip()
+        key = query_serializer.validated_data['key'].strip()
+        paginator = self.pagination_class()
+        page_size = paginator.get_page_size(request) or paginator.page_size
+        page_number_raw = request.query_params.get(paginator.page_query_param, 1)
+        try:
+            page_number = int(page_number_raw)
+        except (TypeError, ValueError):
+            raise ValidationError({paginator.page_query_param: ['page参数格式错误，应为正整数']})
+        if page_number <= 0:
+            raise ValidationError({paginator.page_query_param: ['page参数格式错误，应为正整数']})
+        offset = (page_number - 1) * page_size
 
         sql = """
-            SELECT
-                a.ACCNT_ORG_ID AS accnt_org_id,
-                a.ECIF_CUST_ID AS ecif_cust_id,
-                a.ORIG_ACCT_ID AS orig_acct_id,
-                a.GENR_ACCT_ID AS genr_acct_id,
-                a.CUST_NAME AS cust_name,
-                c.LINE_ID_NAME AS line_id_name,
-                b.MNG_ACCNT_PROD_NAME AS mng_accnt_prod_name,
-                FORMAT(
-                    a.BAL_MON_ACCUM / (DATEDIFF(a.DATA_DT, DATE_FORMAT(a.DATA_DT, '%%Y-%%m-01')) + 1),
-                    2
-                ) AS month_daily_avg,
-                FORMAT(
-                    a.BAL_YEAR_ACCUM / (DATEDIFF(a.DATA_DT, DATE_FORMAT(a.DATA_DT, '%%Y-01-01')) + 1),
-                    2
-                ) AS year_daily_avg,
-                d.KPI_PROP AS kpi_prop,
-                d.APL_DATA_DT AS apl_data_dt,
-                c.org_code AS org_code
-            FROM i01_sz_acct_sum_d AS a, shenzhen_prop_status AS d, mng_accnt_prod AS b, line_id AS c
-            WHERE a.GENR_ACCT_ID = d.GENR_ACCT_ID
-              AND a.MNG_ACCNT_PROD_ID = b.MNG_ACCNT_PROD_ID
-              AND a.LINE_ID = c.LINE_ID
-              AND c.org_code <> '44030005'
-              AND d.employee_no = %s
-            ORDER BY c.LINE_ID_NAME, a.ECIF_CUST_ID, a.ORIG_ACCT_ID
+            (SELECT a.ACCNT_ORG_ID,a.ECIF_CUST_ID,a.ORIG_ACCT_ID,a.GENR_ACCT_ID,a.cust_name,c.LINE_ID_NAME,b.mng_accnt_prod_name,
+            FORMAT(a.BAL_MON_ACCUM/(DATEDIFF(a.data_dt,DATE_FORMAT(a.data_dt,'%%Y-%%m-01'))+1),2) AS monthly_avg,
+            FORMAT(a.BAL_YEAR_ACCUM/(DATEDIFF(a.data_dt,DATE_FORMAT(a.data_dt,'%%Y-01-01'))+1),2)AS yearly_avg,
+            d.kpi_prop,d.apl_data_dt,c.org_code
+            FROM shenzhen_data.i01_sz_acct_sum_d AS a
+            INNER JOIN shenzhen_data.shenzhen_prop_status AS d ON a.GENR_ACCT_ID = d.GENR_ACCT_ID
+            INNER JOIN shenzhen_data.mng_accnt_prod AS b ON a.MNG_ACCNT_PROD_ID = b.MNG_ACCNT_PROD_ID
+            INNER JOIN shenzhen_data.line_id AS c ON a.LINE_ID = c.LINE_ID
+            WHERE c.org_code <> '44030005' AND d.PROP_STATUS_FLG = '1' AND d.employee_no = %s AND (d.cust_name = %s OR d.ORIG_ACCT_ID = %s OR d.ECIF_CUST_ID = %s)
+            ORDER BY LINE_ID_NAME, ECIF_CUST_ID, ORIG_ACCT_ID)
+            union all
+            (
+            WITH filtered_prop AS 
+            (SELECT * FROM shenzhen_data.shenzhen_prop_status
+            WHERE PROP_STATUS_FLG = '1' AND LINE_ORG_CODE = '44030005' AND employee_no = %s  AND (cust_name = %s OR ORIG_ACCT_ID = %s OR ECIF_CUST_ID = %s)),
+            acct_sum AS (SELECT a.ECIF_CUST_ID,a.GENR_ACCT_ID,group_CONCAT(distinct b.mng_accnt_prod_name) AS mng_accnt_prod_name,ROUND(SUM(a.BAL_MON_ACCUM) / (DATEDIFF(a.data_dt, DATE_FORMAT(a.data_dt, '%%Y-%%m-01')) + 1), 2) AS month_avg,ROUND(SUM(a.BAL_YEAR_ACCUM) / (DATEDIFF(a.data_dt, DATE_FORMAT(a.data_dt, '%%Y-01-01')) + 1), 2) AS daily_avg,c.org_code
+            FROM i01_sz_acct_sum_d a
+            JOIN mng_accnt_prod b ON a.MNG_ACCNT_PROD_ID = b.MNG_ACCNT_PROD_ID
+            JOIN line_id c ON a.LINE_ID = c.LINE_ID
+            WHERE a.CCY_CD IN ('156', 'B02') AND a.ORIG_ACCT_ID IS NOT NULL AND a.LINE_ID <> 'L0205' AND c.org_code = '44030005' AND a.ECIF_CUST_ID IN (SELECT ECIF_CUST_ID FROM filtered_prop)
+            GROUP BY a.ECIF_CUST_ID)
+            SELECT p.ACCOUNTING_ORG_ID,p.ECIF_CUST_ID,p.ORIG_ACCT_ID,p.GENR_ACCT_ID,p.cust_name,'个人金融条线' AS business_line,a.mng_accnt_prod_name,a.month_avg,a.daily_avg,p.kpi_prop,p.apl_data_dt,a.org_code
+            FROM filtered_prop p
+            JOIN acct_sum a ON p.ECIF_CUST_ID = a.ECIF_CUST_ID
+            ORDER BY p.ECIF_CUST_ID
+            )
         """
+        sql_params = [employee_no, key, key, key, employee_no, key, key, key]
+        count_sql = f"SELECT COUNT(1) FROM ({sql}) AS personal_prop_status_list"
+        paginated_sql = f"SELECT * FROM ({sql}) AS personal_prop_status_list LIMIT %s OFFSET %s"
 
         with connection.cursor() as cursor:
-            cursor.execute(sql, [employee_no])
+            cursor.execute(count_sql, sql_params)
+            total_count = cursor.fetchone()[0]
+            cursor.execute(paginated_sql, sql_params + [page_size, offset])
             columns = [column[0] for column in cursor.description]
             data = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
         return Response(
             {
                 'message': '查询成功',
-                'data': data,
+                'data': {
+                    'count': total_count,
+                    'data': data,
+                },
             }
         )
 

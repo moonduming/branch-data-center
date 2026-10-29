@@ -400,6 +400,7 @@ class PersonalDashboardViewTests(SimpleTestCase):
     def test_personal_prop_status_view_queries_with_raw_sql(self, mock_connection):
         cursor = MagicMock()
         mock_connection.cursor.return_value.__enter__.return_value = cursor
+        cursor.fetchone.return_value = (1,)
         cursor.description = [
             ('accnt_org_id',),
             ('ecif_cust_id',),
@@ -408,8 +409,8 @@ class PersonalDashboardViewTests(SimpleTestCase):
             ('cust_name',),
             ('line_id_name',),
             ('mng_accnt_prod_name',),
-            ('month_daily_avg',),
-            ('year_daily_avg',),
+            ('monthly_avg',),
+            ('yearly_avg',),
             ('kpi_prop',),
             ('apl_data_dt',),
             ('org_code',),
@@ -433,35 +434,51 @@ class PersonalDashboardViewTests(SimpleTestCase):
 
         request = self.factory.get(
             '/api/datahub/dashboard/personal/prop-statuses/',
-            {'employee_no': 'EMP001'},
+            {'employee_no': 'EMP001', 'key': 'KEY001', 'page_size': 10},
         )
         force_authenticate(request, user=self.user)
 
         response = PerfIndicatorPersonalPropStatusView.as_view()(request)
 
         self.assertEqual(response.status_code, 200)
-        executed_sql = cursor.execute.call_args.args[0]
-        self.assertIn('FROM i01_sz_acct_sum_d AS a, shenzhen_prop_status AS d, mng_accnt_prod AS b, line_id AS c', executed_sql)
-        self.assertIn("AND d.employee_no = %s", executed_sql)
-        self.assertEqual(cursor.execute.call_args.args[1], ['EMP001'])
+        self.assertEqual(cursor.execute.call_count, 2)
+        count_sql = cursor.execute.call_args_list[0].args[0]
+        count_params = cursor.execute.call_args_list[0].args[1]
+        paginated_sql = cursor.execute.call_args_list[1].args[0]
+        paginated_params = cursor.execute.call_args_list[1].args[1]
+        self.assertIn('select count(1) from', count_sql.lower())
+        self.assertIn('union all', count_sql.lower())
+        self.assertIn("AND d.PROP_STATUS_FLG = '1'", count_sql)
+        self.assertIn("AND d.employee_no = %s", count_sql)
+        self.assertIn("AND (d.cust_name = %s OR d.ORIG_ACCT_ID = %s OR d.ECIF_CUST_ID = %s)", count_sql)
+        self.assertIn("LINE_ORG_CODE = '44030005'", count_sql)
+        self.assertEqual(count_params, ['EMP001', 'KEY001', 'KEY001', 'KEY001', 'EMP001', 'KEY001', 'KEY001', 'KEY001'])
+        self.assertIn('limit %s offset %s', paginated_sql.lower())
+        self.assertEqual(
+            paginated_params,
+            ['EMP001', 'KEY001', 'KEY001', 'KEY001', 'EMP001', 'KEY001', 'KEY001', 'KEY001', 10, 0],
+        )
         self.assertEqual(
             response.data['data'],
-            [
-                {
-                    'accnt_org_id': '44030101',
-                    'ecif_cust_id': 'ECIF001',
-                    'orig_acct_id': 'ACCT001',
-                    'genr_acct_id': 'GENR001',
-                    'cust_name': '张三',
-                    'line_id_name': '公司银行条线',
-                    'mng_accnt_prod_name': '产品A',
-                    'month_daily_avg': '1,234.56',
-                    'year_daily_avg': '7,890.12',
-                    'kpi_prop': Decimal('0.5000'),
-                    'apl_data_dt': '2026-05-01 10:00:00',
-                    'org_code': '44030001',
-                }
-            ],
+            {
+                'count': 1,
+                'data': [
+                    {
+                        'accnt_org_id': '44030101',
+                        'ecif_cust_id': 'ECIF001',
+                        'orig_acct_id': 'ACCT001',
+                        'genr_acct_id': 'GENR001',
+                        'cust_name': '张三',
+                        'line_id_name': '公司银行条线',
+                        'mng_accnt_prod_name': '产品A',
+                        'monthly_avg': '1,234.56',
+                        'yearly_avg': '7,890.12',
+                        'kpi_prop': Decimal('0.5000'),
+                        'apl_data_dt': '2026-05-01 10:00:00',
+                        'org_code': '44030001',
+                    }
+                ],
+            },
         )
 
 
